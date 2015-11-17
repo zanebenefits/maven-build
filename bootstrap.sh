@@ -166,8 +166,7 @@ function runPlaybook () {
   fi
 
   if [ -f ${DEPENDENCIES_FILE} ]; then
-    mkdir -p ~/.ansibleRoles
-    awk '{ if(NF < 2) $2 = "current" }; { system("aws s3 cp s3://deployartifacts/ansibleRoles/"$1"-"$2".tar.gz - | tar -xz -C ~/.ansibleRoles/") }' "$DEPENDENCIES_FILE"
+    ansible-galaxy install -r ${DEPENDENCIES_FILE}
   fi
 
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

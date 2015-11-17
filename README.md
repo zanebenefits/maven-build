@@ -40,5 +40,6 @@ BSD
 
 Author Information
 ------------------
-
-eng@peoplekeep.com
+Heath Eldeen
+Architect
+PeopleKeep.com
