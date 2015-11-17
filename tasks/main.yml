@@ -1,0 +1,73 @@
+---
+# tasks file for maven-build
+
+- name: set working on snap ci
+  set_fact: snap_ci=true
+  when: ansible_env.SNAP_CI is defined
+
+- name: set not on snap ci
+  set_fact: snap_ci=false
+  when: ansible_env.SNAP_CI is not defined
+
+- name: create archive directory
+  file: path={{ maven_archive_dir }} state=directory
+  when: snap_ci and maven_archive_dir is defined
+
+- name: resolve ranges and lock snapshots
+  command: "{{ maven_build_cmd }} versions:resolve-ranges versions:lock-snapshots"
+  args:
+    chdir: "{{ maven_project_dir }}"
+
+- name: get initial project version
+  shell: "{{ maven_build_cmd }} -q -Dexec.executable=\"echo\" -Dexec.args='${project.version}' --non-recursive org.codehaus.mojo:exec-maven-plugin:1.3.1:exec | sed s/-SNAPSHOT/.{{ ansible_env.SNAP_PIPELINE_COUNTER }}/g"
+  args:
+    chdir: "{{ maven_project_dir }}"
+  register: project_version
+  when: snap_ci
+
+- name: project version
+  debug: var=project_version
+
+- name: write out project version to archive dir
+  lineinfile: dest="{{ maven_archive_dir }}/proj.version" line="{{ project_version.stdout }}" state=present create=yes
+  when: snap_ci and maven_archive_dir is defined
+
+- name: set version
+  command: "{{ maven_build_cmd }} versions:set -DnewVersion={{ project_version.stdout }}"
+  args:
+    chdir: "{{ maven_project_dir }}"
+  when: snap_ci
+
+- name: setup dropwizard db overrides for tests
+  set_fact: maven_property_overrides="-Ddw.database.url={{ ansible_env.SNAP_DB_PG_JDBC_URL }} -Ddw.database.user={{ ansible_env.SNAP_DB_PG_USER }} -Ddw.database.password={{ ansible_env.SNAP_DB_PG_PASSWORD }}"
+  when: snap_ci and ansible_env.SNAP_DB_PG_USER is defined
+
+- name: setup empty overrides
+  set_fact: maven_property_overrides=""
+  when: not snap_ci or (snap_ci and ansible_env.SNAP_DB_PG_USER is not defined)
+
+- name: set maven goal for local
+  set_fact: maven_goal="clean install"
+  when: not snap_ci
+
+- name: set maven goal for snap NOT Pull Request
+
+  set_fact: maven_goal="deploy"
+  when: snap_ci and ansible_env.SNAP_PULL_REQUEST_NUMBER is not defined
+
+- name: set maven goal for snap Pull Request
+  set_fact: maven_goal="install"
+  when: snap_ci and ansible_env.SNAP_PULL_REQUEST_NUMBER is defined
+
+- name: deploy
+  command: "{{ maven_build_cmd }} {{ maven_goal }} {{ maven_property_overrides }}"
+  args:
+    chdir: "{{ maven_project_dir }}"
+
+### TODO ansible 2.0 'find' task
+- name: archive the file
+  shell: cp *-webservice/target/*.zip {{ maven_archive_dir }}/
+  args:
+    chdir: "{{ maven_project_dir }}"
+  when: maven_archive_dir is defined
+

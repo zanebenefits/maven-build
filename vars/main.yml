@@ -1,0 +1,4 @@
+---
+# vars file for maven-build
+
+maven_build_cmd: "mvn -B -U"
