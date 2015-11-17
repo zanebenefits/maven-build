@@ -166,10 +166,10 @@ function runPlaybook () {
   fi
 
   if [ -f ${DEPENDENCIES_FILE} ]; then
-    ansible-galaxy install -r ${DEPENDENCIES_FILE}
+    ansible-galaxy install -ir ${DEPENDENCIES_FILE}
   fi
 
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-  ANSIBLE_CONFIG="$(dirname ${DIR}/${1})/ansible.cfg" ansible-playbook -i ${ANSIBLE_INVENTORY} ${DIR}/${1} -e "base_dir=${DIR} ${ANSIBLE_EXTRA_ARGS}"
+  ansible-playbook -i ${ANSIBLE_INVENTORY} ${DIR}/${1} -e "base_dir=${DIR} ${ANSIBLE_EXTRA_ARGS}"
 }

@@ -59,7 +59,7 @@
   set_fact: maven_goal="install"
   when: snap_ci and ansible_env.SNAP_PULL_REQUEST_NUMBER is defined
 
-- name: deploy
+- name: run maven
   command: "{{ maven_build_cmd }} {{ maven_goal }} {{ maven_property_overrides }}"
   args:
     chdir: "{{ maven_project_dir }}"
