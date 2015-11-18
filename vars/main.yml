@@ -2,3 +2,4 @@
 # vars file for maven-build
 
 maven_build_cmd: "mvn -B -U"
+maven_archive_filename: "*-webservice/target/*.zip"

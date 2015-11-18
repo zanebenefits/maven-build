@@ -10,7 +10,7 @@
   when: ansible_env.SNAP_CI is not defined
 
 - name: create archive directory
-  file: path={{ maven_archive_dir }} state=directory
+  file: path="{{ maven_project_dir }}/{{ maven_archive_dir }}" state=directory
   when: snap_ci and maven_archive_dir is defined
 
 - name: resolve ranges and lock snapshots
@@ -29,7 +29,7 @@
   debug: var=project_version
 
 - name: write out project version to archive dir
-  lineinfile: dest="{{ maven_archive_dir }}/proj.version" line="{{ project_version.stdout }}" state=present create=yes
+  lineinfile: dest="{{ maven_project_dir }}/{{ maven_archive_dir }}/proj.version" line="{{ project_version.stdout }}" state=present create=yes
   when: snap_ci and maven_archive_dir is defined
 
 - name: set version
@@ -66,7 +66,7 @@
 
 ### TODO ansible 2.0 'find' task
 - name: archive the file
-  shell: cp *-webservice/target/*.zip {{ maven_archive_dir }}/
+  shell: cp {{ maven_archive_filename }} {{ maven_archive_dir }}/
   args:
     chdir: "{{ maven_project_dir }}"
   when: maven_archive_dir is defined
