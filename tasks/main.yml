@@ -69,5 +69,5 @@
   shell: cp {{ maven_archive_filename }} {{ maven_archive_dir }}/
   args:
     chdir: "{{ maven_project_dir }}"
-  when: maven_archive_dir is defined
+  when: snap_ci and maven_archive_dir is defined
 
