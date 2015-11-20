@@ -1,0 +1,11 @@
+---
+# this playbook is for building a java project with maven
+
+- hosts: localhost
+  sudo: no
+  connection: local
+  roles:
+  - { role: maven-build, maven_project_dir: "{{ base_dir }}" }
+# you can even add your own roles here
+
+# and or tasks down here

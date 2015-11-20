@@ -61,7 +61,7 @@ function installAnsible () {
                 $ sudo apt-get install software-properties-common
                 $ sudo apt-add-repository ppa:ansible/ansible
                 $ sudo apt-get update
-                $ sudo apt-get install ansible"
+                $ sudo apt-get install ansible python-boto"
           exit -1
         fi
       fi
@@ -165,11 +165,11 @@ function runPlaybook () {
     ANSIBLE_INVENTORY="localhost,"
   fi
 
-  if [ -f ${DEPENDENCIES_FILE} ]; then
-    ansible-galaxy install -ir ${DEPENDENCIES_FILE}
+  if [ -n "$DEPENDENCIES_FILE" ] && [ -f ${DEPENDENCIES_FILE} ]; then
+    ansible-galaxy install --force -r ${DEPENDENCIES_FILE}
   fi
 
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-  ansible-playbook -i ${ANSIBLE_INVENTORY} ${DIR}/${1} -e "base_dir=${DIR} ${ANSIBLE_EXTRA_ARGS}"
+  ansible-playbook -i ${ANSIBLE_INVENTORY} ${DIR}/${1} -e "maven_project_dir=${DIR} ${ANSIBLE_EXTRA_ARGS}"
 }
