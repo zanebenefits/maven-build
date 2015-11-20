@@ -36,7 +36,7 @@ An example of how to use the role:
       
 where `base_dir` is the full path to the maven project directory to work in.  
 
-Also added example playbood and dependencies file in `provisioning` dir.
+Also added example playbook and dependencies file in `provisioning` dir.
 
 License
 -------

@@ -11,7 +11,7 @@ function installAnsible () {
   fi
   echo ""
   echo "Installing Ansible. This script does not try very"
-  echo "hard but will do it's best to get it installed."
+  echo "hard but will do its best to get it installed."
   echo "If anything could be determined, it is shown here:"
   echo ""
 
